@@ -62,3 +62,15 @@ node --check frontend/vite.config.js
 - Flask entrypoint + Procfile + requirements are present.
 - Frontend and backend folders are both present and separate.
 - No merge conflict markers remain.
+
+## Branching for PRs
+
+Recommended flow for a clean PR branch:
+
+```bash
+git checkout -b feature/<name>
+git fetch origin
+git rebase origin/main
+```
+
+Resolve conflicts (if any), then push the feature branch.
