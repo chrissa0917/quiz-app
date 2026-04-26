@@ -1,7 +1,28 @@
+# dependencies
 node_modules/
+**/node_modules/
+
+# environment
 .env
 .env.*
 !.env.example
+**/.env
+**/.env.*
+
+# build outputs
+build/
+**/build/
 dist/
+**/dist/
+.next/
+**/.next/
 coverage/
+
+# tooling caches
+.vercel/
+**/.vercel/
+.parcel-cache/
+*.tsbuildinfo
+
+# OS noise
 .DS_Store

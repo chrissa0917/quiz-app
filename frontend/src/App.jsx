@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-const apiBase = import.meta.env.VITE_API_BASE_URL;
+const apiBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
 
 export default function App() {
   const [questions, setQuestions] = useState([]);
@@ -52,6 +52,7 @@ export default function App() {
     setFeedback(data.feedback ?? []);
   };
 
+  if (!apiBase) return <main className="shell">Missing VITE_API_BASE_URL.</main>;
   if (loading) return <main className="shell">Loading…</main>;
   if (!questions.length) return <main className="shell">No questions available.</main>;
 
