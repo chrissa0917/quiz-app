@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
@@ -178,9 +180,17 @@ def start_quiz():
 
 @app.route('/quiz/<int:question_id>', methods=['GET', 'POST'])
 def quiz(question_id):
+    if question_id < 1 or question_id > len(questions):
+        return redirect(url_for('start_quiz'))
+
+    if 'responses' not in session:
+        session['responses'] = []
+
     if request.method == 'POST':
         # Save the response
         selected_option = request.form.get('answer')
+        if selected_option is None:
+            return redirect(url_for('quiz', question_id=question_id))
         session['responses'].append({'question_id': question_id, 'answer': selected_option})
         session.modified = True
 
@@ -194,7 +204,13 @@ def quiz(question_id):
 @app.route('/feedback/<int:question_id>')
 def feedback(question_id):
     responses = session.get('responses', [])
+    if not responses:
+        return redirect(url_for('start_quiz'))
+
     current_response = responses[-1]
+    if current_response['question_id'] != question_id:
+        return redirect(url_for('feedback', question_id=current_response['question_id']))
+
     question = questions[current_response['question_id'] - 1]
     selected_option = int(current_response['answer'])
     feedback = question['feedback'][selected_option]
