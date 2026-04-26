@@ -1,42 +1,64 @@
-# Flask Deployment Entrypoint Fix
+# Quiz App Monorepo (Flask + React + Express)
 
-This repository now includes a root Flask entrypoint so cloud platforms can auto-detect and start the app.
+This repo keeps the latest working deployment structure in one place:
 
-## Entrypoint
+- `app.py` (root Flask entrypoint for hosts expecting Flask autodetection)
+- `frontend/` (Vite + React app)
+- `backend/` (Express API + Prisma)
 
-- Root file: `app.py`
-- WSGI app object: `app`
-- Templates: `templates/`
+## Repository layout
 
-Most hosts that look for `app.py`, `main.py`, or `server.py` will now detect this project correctly.
-
-## Required files for deployment
-
-- `app.py` (Flask app exposed as `app`)
-- `requirements.txt` (Python dependencies)
-- `Procfile` (explicit process command for hosts that support it)
-
-## Deploy commands
-
-### Generic Python host
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
+```text
+.
+├── app.py
+├── Procfile
+├── requirements.txt
+├── templates/
+├── frontend/
+└── backend/
 ```
 
-Start command:
+## Deployment targets
+
+### Flask entrypoint (root)
+
+- Entrypoint file: `app.py`
+- App object: `app`
+- Start command (Procfile): `gunicorn app:app`
+
+### Frontend (Vercel)
+
+- Root directory: `frontend`
+- Build command: `npm run build`
+- Output directory: `dist`
+- Env var: `VITE_API_BASE_URL=https://<your-render-api>.onrender.com`
+
+### Backend (Render)
+
+- Root directory: `backend`
+- Build command: `npm install && npx prisma generate && npx prisma migrate deploy`
+- Start command: `npm start`
+- Env vars: `DATABASE_URL`, `CORS_ORIGIN`
+
+## Dependency notes
+
+- Python dependencies are isolated in `requirements.txt` for Flask deployment.
+- Node dependencies are isolated per app in:
+  - `frontend/package.json`
+  - `backend/package.json`
+
+## Quick checks
 
 ```bash
-gunicorn app:app
+python -m py_compile app.py
+node --check backend/src/server.js
+node --check backend/src/questions.js
+node --check frontend/vite.config.js
 ```
 
-### Local run
+## Conflict-resolution status
 
-```bash
-pip install -r requirements.txt
-python app.py
-```
-
-The app binds to `PORT` when provided by the host, otherwise defaults to `10000`.
+- Only one `app.py` exists at repo root.
+- Flask entrypoint + Procfile + requirements are present.
+- Frontend and backend folders are both present and separate.
+- No merge conflict markers remain.
